@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบติดตามการส่งงาน | กลุ่มบริหารงานวิชาการ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <div>
+        <h1>ระบบติดตามการส่งงาน</h1>
+        <p>กลุ่มบริหารงานวิชาการ &nbsp;·&nbsp; โรงเรียน</p>
+      </div>
+    </div>
+    <div class="nav-links">
+      <div class="term-badge"><span class="dot"></span> ภาคเรียนที่ 1 ปีการศึกษา 2569</div>
+      <a href="admin.html">เข้าสู่ระบบ Admin</a>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="ring-card">
+      <div class="ring-wrap">
+        <svg width="76" height="76" viewBox="0 0 76 76">
+          <circle class="ring-bg" cx="38" cy="38" r="34"></circle>
+          <circle id="ringFg" class="ring-fg" cx="38" cy="38" r="34"></circle>
+        </svg>
+        <div class="ring-num" id="ringNum">0%</div>
+      </div>
+      <div class="ring-label">
+        <h3>ภาพรวมความสำเร็จ</h3>
+        <div class="big" id="sentOfTotal">0 / 0 งาน</div>
+        <div class="small">ส่งแล้วจากทั้งหมด</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="top"><div class="icon ic-sent"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></div></div>
+      <div class="num" id="cSent">0</div>
+      <div class="lbl">ส่งแล้ว</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="top"><div class="icon ic-review"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.2 2"/></svg></div></div>
+      <div class="num" id="cReview">0</div>
+      <div class="lbl">รอตรวจสอบ</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="top"><div class="icon ic-open"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg></div></div>
+      <div class="num" id="cOpen">0</div>
+      <div class="lbl">ยังไม่ส่ง</div>
+    </div>
+
+    <div class="stat-card">
+      <div class="top"><div class="icon ic-late"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></div></div>
+      <div class="num" id="cLate">0</div>
+      <div class="lbl">เกินกำหนด</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input id="searchInput" type="text" placeholder="ค้นหาชื่อครู หรือ ชื่องาน...">
+    </div>
+    <div class="select-wrap">
+      <select id="statusFilter">
+        <option value="all">สถานะทั้งหมด</option>
+        <option value="sent">ส่งแล้ว</option>
+        <option value="review">รอตรวจ</option>
+        <option value="open">ยังไม่ส่ง</option>
+        <option value="soon">ใกล้ครบกำหนด</option>
+        <option value="today">ครบกำหนดวันนี้</option>
+        <option value="late">เกินกำหนด</option>
+      </select>
+    </div>
+    <div class="select-wrap">
+      <select id="groupFilter">
+        <option value="all">กลุ่มสาระทั้งหมด</option>
+      </select>
+    </div>
+    <div class="result-count" id="resultCount">0 รายการ</div>
+  </div>
+
+  <div class="table-card">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:26%">คุณครู</th>
+          <th style="width:26%">งานที่ต้องส่ง</th>
+          <th style="width:18%">กำหนดส่ง</th>
+          <th style="width:18%">สถานะ</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr class="empty-row"><td colspan="4">กำลังโหลดข้อมูล...</td></tr>
+      </tbody>
+    </table>
+    <div class="legend">
+      <span><span class="bdot" style="background:#274E13"></span>ส่งแล้ว — งานเสร็จสมบูรณ์</span>
+      <span><span class="bdot" style="background:#1155CC"></span>รอตรวจ — รอดำเนินการตรวจสอบ</span>
+      <span><span class="bdot" style="background:#666666"></span>ยังไม่ส่ง — ยังไม่ถึงกำหนด</span>
+      <span><span class="bdot" style="background:#B45F06"></span>ใกล้ครบกำหนด — เหลือ 1–3 วัน</span>
+      <span><span class="bdot" style="background:#CC4125"></span>ครบกำหนดวันนี้</span>
+      <span><span class="bdot" style="background:#990000"></span>เกินกำหนด — ต้องติดตามด่วน</span>
+    </div>
+  </div>
+
+  <footer>ข้อมูลอัปเดตอัตโนมัติทุก 30 วินาที · ระบบสำหรับใช้งานภายในโรงเรียนเท่านั้น</footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/supabase-client.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
