@@ -1,157 +1,108 @@
--- =========================================================
--- ระบบติดตามการส่งงาน กลุ่มบริหารงานวิชาการ
--- Schema + Row Level Security สำหรับ Supabase (Postgres)
--- วิธีใช้: คัดลอกทั้งไฟล์ไปรันใน Supabase Dashboard
---   -> SQL Editor -> New query -> วางแล้วกด Run
--- =========================================================
+# ระบบติดตามการส่งงาน — กลุ่มบริหารงานวิชาการ
 
--- เปิด extension สำหรับสุ่ม uuid (Supabase มักเปิดให้แล้ว แต่กันเหนียว)
-create extension if not exists "pgcrypto";
+Dashboard สาธารณะ + แผงควบคุม Admin สำหรับติดตามสถานะการส่งงานของครู  
+Frontend host บน **GitHub Pages** (static) ต่อกับฐานข้อมูล **Supabase** (Postgres + Auth)
 
--- ---------------------------------------------------------
--- ตาราง teachers : รายชื่อคุณครู
--- ---------------------------------------------------------
-create table if not exists teachers (
-  id            uuid primary key default gen_random_uuid(),
-  name          text not null,
-  subject       text,
-  subject_group text,
-  created_at    timestamptz not null default now()
-);
+---
 
--- ---------------------------------------------------------
--- ตาราง tasks : งาน/ภาระงานที่ต้องส่ง (แม่แบบงาน ไม่ผูกกับครูคนใดคนหนึ่ง)
--- ---------------------------------------------------------
-create table if not exists tasks (
-  id          uuid primary key default gen_random_uuid(),
-  title       text not null,           -- เช่น "แผนการสอนหน่วยที่ 3"
-  description text,
-  due_date    date not null,
-  created_at  timestamptz not null default now()
-);
+## โครงสร้างไฟล์
 
--- ---------------------------------------------------------
--- ตาราง submissions : สถานะการส่งงานของครูแต่ละคน ต่องานแต่ละชิ้น
--- ---------------------------------------------------------
-create table if not exists submissions (
-  id           uuid primary key default gen_random_uuid(),
-  teacher_id   uuid not null references teachers(id) on delete cascade,
-  task_id      uuid not null references tasks(id) on delete cascade,
-  status       text not null default 'open'
-               check (status in ('sent', 'review', 'open', 'late')),
-  -- sent   = ส่งแล้ว
-  -- review = รอตรวจ
-  -- open   = ยังไม่ส่ง (สถานะ "ใกล้ครบกำหนด" / "ครบกำหนดวันนี้" คำนวณฝั่ง frontend จาก due_date)
-  -- late   = เกินกำหนด
-  submitted_at timestamptz,
-  updated_at   timestamptz not null default now(),
-  unique (teacher_id, task_id)
-);
+```
+project-dashboard/
+├── index.html              หน้า dashboard สาธารณะ (อ่านอย่างเดียว)
+├── admin.html              หน้า login + จัดการสถานะงาน (ต้อง auth)
+├── css/
+│   └── style.css           สไตล์ชีตรวม
+├── js/
+│   ├── config.js           ใส่ Supabase URL + anon key ตรงนี้
+│   ├── supabase-client.js  สร้าง client ใช้ร่วมกัน
+│   ├── dashboard.js        โลจิกหน้า dashboard
+│   └── admin.js            โลจิกหน้า admin (login/CRUD)
+├── sql/
+│   └── schema.sql          SQL schema + RLS policy รันบน Supabase
+└── README.md               เอกสารนี้
+```
 
--- index ช่วยให้ query เร็วขึ้นเวลา filter/join บ่อยๆ
-create index if not exists idx_submissions_teacher on submissions(teacher_id);
-create index if not exists idx_submissions_task on submissions(task_id);
-create index if not exists idx_submissions_status on submissions(status);
+---
 
--- trigger อัปเดต updated_at อัตโนมัติทุกครั้งที่แก้ไขแถว
-create or replace function set_updated_at()
-returns trigger as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$ language plpgsql;
+## ขั้นตอนติดตั้ง
 
-drop trigger if exists trg_submissions_updated_at on submissions;
-create trigger trg_submissions_updated_at
-  before update on submissions
-  for each row execute function set_updated_at();
+### 1. สร้างโปรเจกต์ Supabase
+- ไปที่ https://supabase.com → **New project**
+- รอจน provision เสร็จ
 
--- =========================================================
--- ROW LEVEL SECURITY
--- แนวคิด: ระบบมี admin แค่ 1 คน (สร้าง user ผ่าน Supabase Auth
--- โดยตรง ไม่เปิด public signup) ดังนั้นแค่เช็คว่า "login แล้ว
--- หรือยัง" ก็เพียงพอสำหรับแยกสิทธิ์ อ่านอย่างเดียว vs แก้ไขได้
--- =========================================================
+### 2. รัน schema
+- เปิด **SQL Editor** ในโปรเจกต์ → **New query**
+- คัดลอกเนื้อหาทั้งหมดจาก `sql/schema.sql` → **Run**
 
-alter table teachers    enable row level security;
-alter table tasks       enable row level security;
-alter table submissions enable row level security;
+### 3. สร้างบัญชี Admin (คนเดียว)
+- ไปที่ **Authentication → Users → Add user**
+- ใส่อีเมล/รหัสผ่านของ admin
+- ไปที่ **Authentication → Settings** → ปิด "Enable email signups"  
+  (กันไม่ให้คนอื่นสมัครเองได้ ระบบนี้มี admin แค่ user เดียว)
 
--- ---- อ่านได้ทุกคน (ครูเข้ามาดูสถานะตัวเองผ่านหน้า dashboard สาธารณะ) ----
-create policy "public read teachers"
-  on teachers for select
-  using (true);
+### 4. ตั้งค่า Site URL
+- **Authentication → URL Configuration**
+- ใส่ Site URL เป็น `https://<username>.github.io/<repo-name>/`
 
-create policy "public read tasks"
-  on tasks for select
-  using (true);
+### 5. เชื่อมโค้ดกับ Supabase
+- เปิด `js/config.js`
+- แทนที่ `SUPABASE_URL` และ `SUPABASE_ANON_KEY` ด้วยค่าจาก  
+  **Project Settings → API**
 
-create policy "public read submissions"
-  on submissions for select
-  using (true);
+### 6. Deploy ขึ้น GitHub Pages
+```bash
+git init
+git add .
+git commit -m "init dashboard"
+git branch -M main
+git remote add origin https://github.com/<username>/<repo-name>.git
+git push -u origin main
+```
+แล้วไปที่ repo → **Settings → Pages** → Source: `main` branch, root folder → **Save**
 
--- ---- เขียน/แก้ไข/ลบได้เฉพาะผู้ที่ login แล้ว (admin คนเดียว) ----
-create policy "admin write teachers"
-  on teachers for insert
-  to authenticated
-  with check (true);
+เว็บจะขึ้นที่ `https://<username>.github.io/<repo-name>/`
 
-create policy "admin update teachers"
-  on teachers for update
-  to authenticated
-  using (true) with check (true);
+---
 
-create policy "admin delete teachers"
-  on teachers for delete
-  to authenticated
-  using (true);
+## การใช้งาน
 
-create policy "admin write tasks"
-  on tasks for insert
-  to authenticated
-  with check (true);
+### หน้า Dashboard (`index.html`)
+- เปิดดูได้ทุกคนโดยไม่ต้อง login
+- แสดงสถานะการส่งงานของครูทุกคน
+- ค้นหาด้วยชื่อครู/ชื่องาน, กรองตามสถานะ/กลุ่มสาระ
+- ข้อมูลอัปเดตอัตโนมัติทุก 30 วินาที
 
-create policy "admin update tasks"
-  on tasks for update
-  to authenticated
-  using (true) with check (true);
+### หน้า Admin (`admin.html`)
+- เข้าระบบด้วยอีเมล/รหัสผ่าน ที่สร้างไว้ในขั้นตอนที่ 3
+- เปลี่ยนสถานะงานของครูแต่ละคนได้ (ยังไม่ส่ง / รอตรวจ / ส่งแล้ว / เกินกำหนด)
+- ลบรายการส่งงานได้
 
-create policy "admin delete tasks"
-  on tasks for delete
-  to authenticated
-  using (true);
+### สถานะที่ใช้
 
-create policy "admin write submissions"
-  on submissions for insert
-  to authenticated
-  with check (true);
+| สถานะ | เก็บใน DB | คำอธิบาย |
+|---|---|---|
+| ส่งแล้ว | `sent` | งานเสร็จสมบูรณ์ |
+| รอตรวจ | `review` | รอดำเนินการตรวจสอบ |
+| ยังไม่ส่ง | `open` | ยังไม่ถึงกำหนด |
+| ใกล้ครบกำหนด | `open` (คำนวณ) | เหลือ 1–3 วัน |
+| ครบกำหนดวันนี้ | `open` (คำนวณ) | วันนี้เป็นวันสุดท้าย |
+| เกินกำหนด | `late` | ต้องติดตามด่วน |
 
-create policy "admin update submissions"
-  on submissions for update
-  to authenticated
-  using (true) with check (true);
+> **หมายเหตุ**: สถานะ "ใกล้ครบกำหนด" และ "ครบกำหนดวันนี้" ไม่ได้เก็บใน DB แต่คำนวณจาก `due_date` ฝั่ง frontend
 
-create policy "admin delete submissions"
-  on submissions for delete
-  to authenticated
-  using (true);
+---
 
--- =========================================================
--- ข้อมูลตัวอย่าง (ลบทิ้งได้ถ้าไม่ต้องการ)
--- =========================================================
-insert into teachers (name, subject, subject_group) values
-  ('ครูสมชาย ใจดี', 'คณิตศาสตร์', 'คณิตศาสตร์'),
-  ('ครูสุนีย์ พรหมมา', 'ภาษาไทย', 'ภาษาไทย'),
-  ('ครูวิชัย ศรีสุข', 'วิทยาศาสตร์', 'วิทยาศาสตร์')
-on conflict do nothing;
+## หมายเหตุด้านความปลอดภัย
 
-insert into tasks (title, due_date) values
-  ('แผนการสอนหน่วยที่ 3', current_date + 4),
-  ('รายงานผลการปฏิบัติงาน (SAR)', current_date),
-  ('คะแนนเก็บกลางภาค', current_date - 4)
-on conflict do nothing;
+- `anon key` ฝังใน frontend ได้ตามปกติ (ออกแบบมาให้ public)
+- ความปลอดภัยจริงอยู่ที่ **RLS policy**: อ่านได้ทุกคน, เขียน/แก้/ลบได้เฉพาะผู้ที่ login แล้ว
+- **ห้ามใช้ `service_role key`** ในโค้ดฝั่ง frontend เด็ดขาด
+- เพราะปิด public signup ไว้ ผู้ใช้ที่ login สำเร็จได้จึงมีแค่ admin ที่สร้างไว้คนเดียว
 
--- หมายเหตุ: การสร้าง admin user ให้ทำผ่าน
--- Supabase Dashboard -> Authentication -> Users -> Add user
--- (ปิด "Enable email signups" ในหน้า Auth settings เพื่อไม่ให้คนอื่นสมัครเองได้)
+---
+
+## แผนขยายในอนาคต (ถ้าต้องการ)
+- เพิ่มฟอร์มสำหรับเพิ่ม/แก้ไข รายชื่อครู และงานใหม่ ในหน้า admin
+- ใช้ Supabase Realtime subscription แทนการ poll ทุก 30 วินาที
+- เพิ่มการแจ้งเตือนอีเมลอัตโนมัติเมื่อใกล้ครบกำหนด (Supabase Edge Functions + cron)
