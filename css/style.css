@@ -517,3 +517,101 @@ footer{
   border-radius:6px;
   min-height:16px;
 }
+
+/* ---------- Admin Tabs ---------- */
+.tab-bar{
+  display:flex;gap:4px;margin-bottom:20px;
+  background:var(--white);border:1px solid var(--border);
+  border-radius:14px;padding:4px;
+  box-shadow:var(--shadow-sm);
+  animation:fadeInUp var(--duration-slow) var(--ease-out-expo) .1s both;
+}
+.tab-btn{
+  flex:1;padding:11px 20px;border:none;background:transparent;
+  font-family:'Kanit',sans-serif;font-size:14px;font-weight:500;
+  color:var(--muted);cursor:pointer;border-radius:10px;
+  transition:all var(--duration-normal) ease;
+  display:inline-flex;align-items:center;justify-content:center;
+}
+.tab-btn:hover{color:var(--navy);background:var(--blue-softer);}
+.tab-btn.active{
+  background:linear-gradient(135deg,var(--blue),var(--blue-light));
+  color:#fff;
+  box-shadow:0 3px 10px rgba(46,109,164,0.28);
+}
+.tab-btn.active svg{stroke:#fff;}
+.tab-panel{display:none;animation:fadeIn var(--duration-normal) ease;}
+.tab-panel.active{display:block;}
+
+/* ---------- Modal ---------- */
+.modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(11,31,51,0.5);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+  z-index:1000;
+  animation:fadeIn var(--duration-fast) ease;
+}
+.modal-card{
+  background:var(--white);border-radius:20px;
+  padding:32px 28px;width:100%;max-width:440px;margin:16px;
+  box-shadow:var(--shadow-xl);
+  animation:scaleIn var(--duration-normal) var(--ease-out-expo);
+}
+.modal-card h3{
+  font-family:'Kanit',sans-serif;font-size:18px;
+  color:var(--navy);margin:0 0 20px;
+}
+.modal-actions{
+  display:flex;gap:10px;justify-content:flex-end;margin-top:22px;
+}
+.modal-actions .btn{width:auto;}
+
+/* ---------- Inline Editable Fields (Admin Table) ---------- */
+.date-input{
+  padding:7px 10px;border-radius:8px;border:1px solid var(--border);
+  font-family:'Sarabun',sans-serif;font-size:13px;color:var(--text);
+  outline:none;background:var(--white);
+  transition:all var(--duration-fast) ease;
+  width:142px;
+}
+.date-input:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(46,109,164,0.12);
+}
+.task-select{
+  padding:7px 26px 7px 10px;border-radius:8px;border:1px solid var(--border);
+  font-family:'Sarabun',sans-serif;font-size:12.5px;color:var(--text);
+  cursor:pointer;outline:none;background-color:var(--white);
+  appearance:none;-webkit-appearance:none;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" fill="none" stroke="%2364748B" stroke-width="2"><path d="M1 3l4 4 4-4"/></svg>');
+  background-repeat:no-repeat;background-position:right 8px center;
+  transition:all var(--duration-fast) ease;
+  max-width:200px;
+}
+.task-select:focus{
+  border-color:var(--blue);
+  box-shadow:0 0 0 3px rgba(46,109,164,0.12);
+}
+
+/* Danger hover for delete buttons */
+.btn-danger-hover:hover{
+  background:#FEE2E2 !important;color:#991B1B !important;
+  border-color:#FECACA !important;
+}
+
+/* Field select styling in modal */
+.field select{
+  width:100%;padding:11px 32px 11px 14px;border-radius:10px;border:1px solid var(--border);
+  font-family:'Sarabun',sans-serif;font-size:14px;outline:none;
+  background:var(--blue-softer);color:var(--text);
+  appearance:none;-webkit-appearance:none;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="none" stroke="%2364748B" stroke-width="2"><path d="M2 4l4 4 4-4"/></svg>');
+  background-repeat:no-repeat;background-position:right 14px center;
+  cursor:pointer;
+  transition:all var(--duration-normal) ease;
+}
+.field select:focus{
+  border-color:var(--blue);background:#fff;
+  box-shadow:0 0 0 3px rgba(46,109,164,0.12);
+}

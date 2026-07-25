@@ -42,6 +42,7 @@
   <!-- ============ Admin Panel ============ -->
   <div id="adminPanel" class="panel-hidden">
 
+    <!-- Header -->
     <div class="topbar">
       <div class="brand">
         <div class="brand-mark">
@@ -68,37 +69,135 @@
       </div>
     </div>
 
-    <div class="admin-toolbar">
-      <h2>รายการส่งงานทั้งหมด</h2>
-      <button id="refreshBtn" class="btn btn-sm">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
-          <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
-          <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+    <!-- Tab Navigation -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="submissions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px;margin-right:5px">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/>
         </svg>
-        รีเฟรช
+        รายการส่งงาน
+      </button>
+      <button class="tab-btn" data-tab="teachers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;vertical-align:-2px;margin-right:5px">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+        </svg>
+        จัดการครู
       </button>
     </div>
 
-    <div class="table-card">
-      <table>
-        <thead>
-          <tr>
-            <th style="width:24%">คุณครู</th>
-            <th style="width:26%">งานที่ต้องส่ง</th>
-            <th style="width:16%">กำหนดส่ง</th>
-            <th style="width:18%">สถานะ</th>
-            <th style="width:16%"></th>
-          </tr>
-        </thead>
-        <tbody id="adminTableBody">
-          <tr class="empty-row"><td colspan="5">กำลังโหลดข้อมูล...</td></tr>
-        </tbody>
-      </table>
+    <!-- ============ Tab: Submissions ============ -->
+    <div id="tab-submissions" class="tab-panel active">
+      <div class="admin-toolbar">
+        <h2>รายการส่งงานทั้งหมด</h2>
+        <button id="refreshBtn" class="btn btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+            <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+            <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+          </svg>
+          รีเฟรช
+        </button>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:22%">คุณครู</th>
+              <th style="width:22%">งานที่ต้องส่ง</th>
+              <th style="width:16%">กำหนดส่ง</th>
+              <th style="width:16%">สถานะ</th>
+              <th style="width:10%"></th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody">
+            <tr class="empty-row"><td colspan="5">กำลังโหลดข้อมูล...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ============ Tab: Teachers ============ -->
+    <div id="tab-teachers" class="tab-panel">
+      <div class="admin-toolbar">
+        <h2>จัดการรายชื่อครู</h2>
+        <button id="addTeacherBtn" class="btn btn-sm">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          เพิ่มครู
+        </button>
+      </div>
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:30%">ชื่อ-สกุล</th>
+              <th style="width:18%">แผนก</th>
+              <th style="width:28%">กลุ่มสาระ/วิชา</th>
+              <th style="width:24%"></th>
+            </tr>
+          </thead>
+          <tbody id="teacherTableBody">
+            <tr class="empty-row"><td colspan="4">กำลังโหลดข้อมูล...</td></tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
     <footer>ระบบสำหรับ Admin เท่านั้น · ข้อมูลจะอัปเดตเมื่อกด รีเฟรช</footer>
   </div>
 
+</div>
+
+<!-- ============ Modal: Teacher Form ============ -->
+<div id="teacherModal" class="modal-overlay" style="display:none">
+  <div class="modal-card">
+    <h3 id="modalTitle">เพิ่มครูใหม่</h3>
+    <form id="teacherForm">
+      <input type="hidden" id="teacherId">
+      <div class="field">
+        <label for="teacherName">ชื่อ-สกุล</label>
+        <input id="teacherName" type="text" placeholder="เช่น ครูสมชาย ใจดี" required>
+      </div>
+      <div class="field">
+        <label for="teacherDept">แผนก</label>
+        <select id="teacherDept" required>
+          <option value="">— เลือกแผนก —</option>
+          <option value="วอลดอร์ฟ">วอลดอร์ฟ</option>
+          <option value="ปฐมวัย">ปฐมวัย</option>
+          <option value="ประถม">ประถม</option>
+          <option value="มัธยม">มัธยม</option>
+        </select>
+      </div>
+      <div class="field" id="subjectField" style="display:none">
+        <label for="teacherSubject">กลุ่มสาระ/วิชา</label>
+        <select id="teacherSubject">
+          <option value="">— เลือกกลุ่มสาระหรือวิชา —</option>
+          <optgroup label="กลุ่มสาระ">
+            <option value="ภาษาไทย">ภาษาไทย</option>
+            <option value="คณิตศาสตร์">คณิตศาสตร์</option>
+            <option value="วิทยาศาสตร์">วิทยาศาสตร์</option>
+            <option value="สังคมศึกษา">สังคมศึกษา</option>
+            <option value="สุขศึกษา พละศึกษา">สุขศึกษา พละศึกษา</option>
+            <option value="ศิลปะ">ศิลปะ</option>
+          </optgroup>
+          <optgroup label="กลุ่มวิชา">
+            <option value="ภาษาจีน">ภาษาจีน</option>
+            <option value="ภาษาต่างประเทศ">ภาษาต่างประเทศ</option>
+            <option value="เทคโนโลยี">เทคโนโลยี</option>
+            <option value="การงานอาชีพ/คหกรรม">การงานอาชีพ/คหกรรม</option>
+            <option value="พาณิชยกรรม">พาณิชยกรรม</option>
+            <option value="ช่างอุตสาหกรรม">ช่างอุตสาหกรรม</option>
+            <option value="แนะแนว">แนะแนว</option>
+            <option value="เกษตร">เกษตร</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary btn-sm" id="cancelModal">ยกเลิก</button>
+        <button type="submit" class="btn btn-sm">บันทึก</button>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>

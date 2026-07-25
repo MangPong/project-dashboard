@@ -14,6 +14,7 @@ create extension if not exists "pgcrypto";
 create table if not exists teachers (
   id            uuid primary key default gen_random_uuid(),
   name          text not null,
+  department    text,
   subject       text,
   subject_group text,
   created_at    timestamptz not null default now()
@@ -26,7 +27,6 @@ create table if not exists tasks (
   id          uuid primary key default gen_random_uuid(),
   title       text not null,           -- เช่น "แผนการสอนหน่วยที่ 3"
   description text,
-  due_date    date not null,
   created_at  timestamptz not null default now()
 );
 
@@ -37,6 +37,7 @@ create table if not exists submissions (
   id           uuid primary key default gen_random_uuid(),
   teacher_id   uuid not null references teachers(id) on delete cascade,
   task_id      uuid not null references tasks(id) on delete cascade,
+  due_date     date not null default current_date,
   status       text not null default 'open'
                check (status in ('sent', 'review', 'open', 'late')),
   -- sent   = ส่งแล้ว
@@ -52,6 +53,7 @@ create table if not exists submissions (
 create index if not exists idx_submissions_teacher on submissions(teacher_id);
 create index if not exists idx_submissions_task on submissions(task_id);
 create index if not exists idx_submissions_status on submissions(status);
+create index if not exists idx_submissions_due_date on submissions(due_date);
 
 -- trigger อัปเดต updated_at อัตโนมัติทุกครั้งที่แก้ไขแถว
 create or replace function set_updated_at()
@@ -140,24 +142,30 @@ create policy "admin delete submissions"
 -- =========================================================
 -- ข้อมูลตัวอย่าง (ลบทิ้งได้ถ้าไม่ต้องการ)
 -- =========================================================
-insert into teachers (name, subject, subject_group) values
-  ('ครูสมชาย ใจดี', 'คณิตศาสตร์', 'คณิตศาสตร์'),
-  ('ครูสุนีย์ พรหมมา', 'ภาษาไทย', 'ภาษาไทย'),
-  ('ครูวิชัย ศรีสุข', 'วิทยาศาสตร์', 'วิทยาศาสตร์')
+insert into teachers (name, department, subject, subject_group) values
+  ('ครูสมชาย ใจดี', 'ประถม', 'คณิตศาสตร์', 'ประถม'),
+  ('ครูสุนีย์ พรหมมา', 'มัธยม', 'ภาษาไทย', 'มัธยม'),
+  ('ครูวิชัย ศรีสุข', 'ประถม', 'วิทยาศาสตร์', 'ประถม')
 on conflict do nothing;
 
-insert into tasks (title, due_date) values
-  ('แผนการสอนหน่วยที่ 3', current_date + 4),
-  ('รายงานผลการปฏิบัติงาน (SAR)', current_date),
-  ('คะแนนเก็บกลางภาค', current_date - 4)
+insert into tasks (title) values
+  ('แผนการสอนหน่วยที่ 3'),
+  ('รายงานผลการปฏิบัติงาน (SAR)'),
+  ('คะแนนเก็บกลางภาค')
 on conflict do nothing;
 
 -- สร้าง submissions ตัวอย่างโดยอ้างอิงจาก teachers + tasks ที่เพิ่งใส่
--- (ครูทุกคน x งานทุกชิ้น พร้อมสถานะที่หลากหลายเพื่อทดสอบ)
-insert into submissions (teacher_id, task_id, status, submitted_at)
+-- (ครูทุกคน x งานทุกชิ้น พร้อมสถานะและ due_date ที่หลากหลายเพื่อทดสอบ)
+insert into submissions (teacher_id, task_id, due_date, status, submitted_at)
 select
   t.id,
   tk.id,
+  case
+    when tk.title = 'แผนการสอนหน่วยที่ 3' then current_date + 4
+    when tk.title = 'รายงานผลการปฏิบัติงาน (SAR)' then current_date
+    when tk.title = 'คะแนนเก็บกลางภาค' then current_date - 4
+    else current_date
+  end,
   case
     when tk.title = 'แผนการสอนหน่วยที่ 3' and t.name = 'ครูสมชาย ใจดี'   then 'sent'
     when tk.title = 'แผนการสอนหน่วยที่ 3' and t.name = 'ครูสุนีย์ พรหมมา' then 'review'

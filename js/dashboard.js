@@ -45,9 +45,9 @@ async function loadData(){
   const { data, error } = await sb
     .from('submissions')
     .select(`
-      id, status, due_date:tasks(due_date),
-      teacher:teachers ( name, subject ),
-      task:tasks ( title, due_date )
+      id, status, due_date,
+      teacher:teachers ( name, subject, department ),
+      task:tasks ( title )
     `);
 
   if(error){
@@ -61,8 +61,9 @@ async function loadData(){
     id: r.id,
     name: r.teacher.name,
     subject: r.teacher.subject,
+    department: r.teacher.department,
     task: r.task.title,
-    due_date: r.task.due_date,
+    due_date: r.due_date,
     status: r.status,
   }));
 
@@ -88,11 +89,14 @@ function render(){
 
   const rows = ALL_ROWS.map(r => ({...r, display: deriveDisplayStatus(r)}));
 
+  const deptVal = document.getElementById('deptFilter').value;
+
   const filtered = rows.filter(row=>{
     const matchesQ = !q || row.name.toLowerCase().includes(q) || row.task.toLowerCase().includes(q);
     const matchesStatus = statusVal === 'all' || row.display === statusVal;
     const matchesGroup = groupVal === 'all' || row.subject === groupVal;
-    return matchesQ && matchesStatus && matchesGroup;
+    const matchesDept = deptVal === 'all' || row.department === deptVal;
+    return matchesQ && matchesStatus && matchesGroup && matchesDept;
   });
 
   const tbody = document.getElementById('tableBody');
@@ -116,7 +120,7 @@ function render(){
             <div class="avatar">${initials(row.name)}</div>
             <div class="teacher-meta">
               <div class="name">${row.name}</div>
-              <div class="subject">${row.subject || ''}</div>
+              <div class="subject">${[row.subject, row.department].filter(Boolean).join(' · ')}</div>
             </div>
           </div>
         </td>
@@ -154,6 +158,7 @@ function render(){
 document.getElementById('searchInput').addEventListener('input', render);
 document.getElementById('statusFilter').addEventListener('change', render);
 document.getElementById('groupFilter').addEventListener('change', render);
+document.getElementById('deptFilter').addEventListener('change', render);
 
 loadData();
 
