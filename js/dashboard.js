@@ -46,7 +46,7 @@ async function loadData(){
     .from('submissions')
     .select(`
       id, status, due_date,
-      teacher:teachers ( name, subject, department ),
+      teacher:teachers ( name, department, subject ),
       task:tasks ( title )
     `);
 
@@ -60,8 +60,8 @@ async function loadData(){
   ALL_ROWS = data.map(r => ({
     id: r.id,
     name: r.teacher.name,
-    subject: r.teacher.subject,
     department: r.teacher.department,
+    subject: r.teacher.subject,
     task: r.task.title,
     due_date: r.due_date,
     status: r.status,
@@ -120,7 +120,7 @@ function render(){
             <div class="avatar">${initials(row.name)}</div>
             <div class="teacher-meta">
               <div class="name">${row.name}</div>
-              <div class="subject">${[row.subject, row.department].filter(Boolean).join(' · ')}</div>
+              <div class="subject">${[row.department, row.subject].filter(Boolean).join(' · ')}</div>
             </div>
           </div>
         </td>
