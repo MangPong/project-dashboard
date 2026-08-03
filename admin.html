@@ -89,13 +89,27 @@
     <div id="tab-submissions" class="tab-panel active">
       <div class="admin-toolbar">
         <h2>รายการส่งงานทั้งหมด</h2>
-        <button id="refreshBtn" class="btn btn-sm">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
-            <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
-            <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
-          </svg>
-          รีเฟรช
-        </button>
+        <div class="btn-group">
+          <button id="downloadSubTemplateBtn" class="btn btn-secondary btn-sm" title="ดาวน์โหลดไฟล์ตัวอย่างสำหรับนำเข้าข้อมูล">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            แม่แบบ Excel
+          </button>
+          <button id="importSubBtn" class="btn btn-secondary btn-sm" title="นำเข้าข้อมูลการส่งงานจากไฟล์ Excel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            นำเข้า Excel
+          </button>
+          <button id="refreshBtn" class="btn btn-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+              <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/>
+              <path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
+            </svg>
+            รีเฟรช
+          </button>
+        </div>
       </div>
       <div class="table-card">
         <table>
@@ -119,12 +133,26 @@
     <div id="tab-teachers" class="tab-panel">
       <div class="admin-toolbar">
         <h2>จัดการรายชื่อครู</h2>
-        <button id="addTeacherBtn" class="btn btn-sm">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
-            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
-          </svg>
-          เพิ่มครู
-        </button>
+        <div class="btn-group">
+          <button id="downloadTeacherTemplateBtn" class="btn btn-secondary btn-sm" title="ดาวน์โหลดไฟล์ตัวอย่างสำหรับนำเข้ารายชื่อครู">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+            </svg>
+            แม่แบบ Excel
+          </button>
+          <button id="importTeacherBtn" class="btn btn-secondary btn-sm" title="นำเข้ารายชื่อครูจากไฟล์ Excel">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            นำเข้า Excel
+          </button>
+          <button id="addTeacherBtn" class="btn btn-sm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;vertical-align:-2px;margin-right:4px">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            เพิ่มครู
+          </button>
+        </div>
       </div>
       <div class="table-card">
         <table>
@@ -200,7 +228,44 @@
   </div>
 </div>
 
+<!-- ============ Modal: Import Excel ============ -->
+<div id="importModal" class="modal-overlay" style="display:none">
+  <div class="modal-card" style="max-width:520px">
+    <h3 id="importModalTitle">นำเข้าข้อมูลจาก Excel</h3>
+    <p id="importModalDesc" style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+      กรุณาเลือกไฟล์ Excel (.xlsx, .xls) หรือ CSV ที่มีรูปแบบคอลัมน์ตรงตามแม่แบบ
+    </p>
+
+    <div class="dropzone" id="dropzone">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:36px;height:36px;margin-bottom:8px;">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <div style="font-weight:600;font-size:14px;color:var(--navy);" id="dropzoneText">คลิกเพื่อเลือกไฟล์ หรือลากไฟล์มาวางที่นี่</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:4px;">รองรับไฟล์ .xlsx, .xls, .csv</div>
+      <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display:none">
+    </div>
+
+    <div id="importProgress" style="display:none;margin-top:16px;">
+      <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:6px;" id="importProgressText">กำลังประมวลผลข้อมูล...</div>
+      <div style="background:var(--blue-soft);height:8px;border-radius:999px;overflow:hidden;">
+        <div id="importProgressBar" style="background:var(--blue);height:100%;width:0%;transition:width 0.2s;"></div>
+      </div>
+    </div>
+
+    <div id="importResultArea" style="display:none;margin-top:16px;max-height:180px;overflow-y:auto;font-size:12.5px;padding:12px;background:var(--blue-softer);border-radius:10px;border:1px solid var(--border);">
+    </div>
+
+    <div class="modal-actions">
+      <button type="button" class="btn btn-secondary btn-sm" id="closeImportModalBtn">ปิด</button>
+      <button type="button" class="btn btn-sm" id="processImportBtn" disabled>เริ่มนำเข้าข้อมูล</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/supabase-client.js"></script>
 <script src="js/admin.js"></script>

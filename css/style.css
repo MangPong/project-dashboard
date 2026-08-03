@@ -615,3 +615,30 @@ footer{
   border-color:var(--blue);background:#fff;
   box-shadow:0 0 0 3px rgba(46,109,164,0.12);
 }
+
+/* Button Group */
+.btn-group{
+  display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+}
+
+/* Dropzone for Excel Upload */
+.dropzone{
+  border:2px dashed var(--blue-light);
+  background:var(--blue-softer);
+  border-radius:14px;
+  padding:28px 20px;
+  text-align:center;
+  cursor:pointer;
+  transition:all var(--duration-normal) ease;
+}
+.dropzone:hover, .dropzone.dragover{
+  background:var(--blue-soft);
+  border-color:var(--blue);
+  transform:scale(1.01);
+}
+
+/* Import Result Area */
+#importResultArea .log-success{color:var(--st-sent-fg);margin-bottom:4px;font-weight:500;}
+#importResultArea .log-error{color:var(--st-late-fg);margin-bottom:4px;font-weight:500;}
+#importResultArea .log-info{color:var(--navy);margin-bottom:4px;}
+
